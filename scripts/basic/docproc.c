@@ -39,7 +39,10 @@
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#ifndef __FreeBSD__
 #include <alloca.h>
+#endif
 
 /* exitstatus is used to keep track of any failing calls to kernel-doc,
  * but execution continues. */

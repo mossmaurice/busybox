@@ -659,10 +659,10 @@ static void add_client_options(struct dhcp_packet *packet)
  * client reverts to using the IP broadcast address.
  */
 
-static int raw_bcast_from_client_config_ifindex(struct dhcp_packet *packet)
+static int raw_bcast_from_client_config_ifindex(struct dhcp_packet *packet, uint32_t src_nip)
 {
 	return udhcp_send_raw_packet(packet,
-		/*src*/ INADDR_ANY, CLIENT_PORT,
+		/*src*/ src_nip, CLIENT_PORT,
 		/*dst*/ INADDR_BROADCAST, SERVER_PORT, MAC_BCAST_ADDR,
 		client_config.ifindex);
 }
@@ -673,7 +673,7 @@ static int bcast_or_ucast(struct dhcp_packet *packet, uint32_t ciaddr, uint32_t 
 		return udhcp_send_kernel_packet(packet,
 			ciaddr, CLIENT_PORT,
 			server, SERVER_PORT);
-	return raw_bcast_from_client_config_ifindex(packet);
+	return raw_bcast_from_client_config_ifindex(packet, ciaddr);
 }
 
 /* Broadcast a DHCP discover packet to the network, with an optionally requested IP */
@@ -681,6 +681,7 @@ static int bcast_or_ucast(struct dhcp_packet *packet, uint32_t ciaddr, uint32_t 
 static NOINLINE int send_discover(uint32_t xid, uint32_t requested)
 {
 	struct dhcp_packet packet;
+	static int msgs = 0;
 
 	/* Fill in: op, htype, hlen, cookie, chaddr fields,
 	 * random xid field (we override it below),
@@ -698,8 +699,9 @@ static NOINLINE int send_discover(uint32_t xid, uint32_t requested)
 	 */
 	add_client_options(&packet);
 
+	if (msgs++ < 3)
 	bb_info_msg("Sending discover...");
-	return raw_bcast_from_client_config_ifindex(&packet);
+	return raw_bcast_from_client_config_ifindex(&packet, INADDR_ANY);
 }
 
 /* Broadcast a DHCP request message */
@@ -743,7 +745,7 @@ static NOINLINE int send_select(uint32_t xid, uint32_t server, uint32_t requeste
 
 	addr.s_addr = requested;
 	bb_info_msg("Sending select for %s...", inet_ntoa(addr));
-	return raw_bcast_from_client_config_ifindex(&packet);
+	return raw_bcast_from_client_config_ifindex(&packet, INADDR_ANY);
 }
 
 /* Unicast or broadcast a DHCP renew message */
@@ -811,7 +813,7 @@ static NOINLINE int send_decline(/*uint32_t xid,*/ uint32_t server, uint32_t req
 	udhcp_add_simple_option(&packet, DHCP_SERVER_ID, server);
 
 	bb_info_msg("Sending decline...");
-	return raw_bcast_from_client_config_ifindex(&packet);
+	return raw_bcast_from_client_config_ifindex(&packet, INADDR_ANY);
 }
 #endif
 
@@ -1085,7 +1087,6 @@ static void perform_renew(void)
 		state = RENEW_REQUESTED;
 		break;
 	case RENEW_REQUESTED: /* impatient are we? fine, square 1 */
-		udhcp_run_script(NULL, "deconfig");
 	case REQUESTING:
 	case RELEASED:
 		change_listen_mode(LISTEN_RAW);
@@ -1397,6 +1398,12 @@ int udhcpc_main(int argc UNUSED_PARAM, char **argv)
 		struct dhcp_packet packet;
 		/* silence "uninitialized!" warning */
 		unsigned timestamp_before_wait = timestamp_before_wait;
+
+		/* When running on a bridge, the ifindex may have changed (e.g. if
+		 * member interfaces were added/removed or if the status of the
+		 * bridge changed).
+		 * Workaround: refresh it here before processing the next packet */
+		udhcp_read_interface(client_config.interface, &client_config.ifindex, NULL, client_config.client_mac);
 
 		//bb_error_msg("sockfd:%d, listen_mode:%d", sockfd, listen_mode);
 

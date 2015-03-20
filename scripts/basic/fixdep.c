@@ -113,7 +113,10 @@
 #include <limits.h>
 #include <ctype.h>
 #include <arpa/inet.h>
+
+#ifndef __FreeBSD__
 #include <alloca.h>
+#endif
 
 /* bbox: not needed
 #define INT_CONF ntohl(0x434f4e46)
