@@ -790,29 +790,29 @@ config BUSYBOX_CONFIG_PREFIX
 
 endmenu
 
-source package/utils/busybox/config/libbb/Config.in
+source config/libbb/Config.in
 
 endmenu
 
 comment "Applets"
 
-source package/utils/busybox/config/archival/Config.in
-source package/utils/busybox/config/coreutils/Config.in
-source package/utils/busybox/config/console-tools/Config.in
-source package/utils/busybox/config/debianutils/Config.in
-source package/utils/busybox/config/editors/Config.in
-source package/utils/busybox/config/findutils/Config.in
-source package/utils/busybox/config/init/Config.in
-source package/utils/busybox/config/loginutils/Config.in
-source package/utils/busybox/config/e2fsprogs/Config.in
-source package/utils/busybox/config/modutils/Config.in
-source package/utils/busybox/config/util-linux/Config.in
-source package/utils/busybox/config/miscutils/Config.in
-source package/utils/busybox/config/networking/Config.in
-source package/utils/busybox/config/printutils/Config.in
-source package/utils/busybox/config/mailutils/Config.in
-source package/utils/busybox/config/procps/Config.in
-source package/utils/busybox/config/runit/Config.in
-source package/utils/busybox/config/selinux/Config.in
-source package/utils/busybox/config/shell/Config.in
-source package/utils/busybox/config/sysklogd/Config.in
+source config/archival/Config.in
+source config/coreutils/Config.in
+source config/console-tools/Config.in
+source config/debianutils/Config.in
+source config/editors/Config.in
+source config/findutils/Config.in
+source config/init/Config.in
+source config/loginutils/Config.in
+source config/e2fsprogs/Config.in
+source config/modutils/Config.in
+source config/util-linux/Config.in
+source config/miscutils/Config.in
+source config/networking/Config.in
+source config/printutils/Config.in
+source config/mailutils/Config.in
+source config/procps/Config.in
+source config/runit/Config.in
+source config/selinux/Config.in
+source config/shell/Config.in
+source config/sysklogd/Config.in
