@@ -260,11 +260,7 @@ int date_main(int argc UNUSED_PARAM, char **argv)
 		settimeofday(NULL, &tz);
 
 		memset(&tz, 0, sizeof(tz));
-#ifdef __USE_BSD
 		tz.tz_minuteswest = -(tm_time.tm_gmtoff / 60);
-#else
-		tz.tz_minuteswest = -(tm_time.__tm_gmtoff / 60);
-#endif
 
 		if (settimeofday(NULL, &tz))
 		{
