@@ -200,7 +200,7 @@ int FAST_FUNC open_zipped(const char *fname)
 	 || (ENABLE_FEATURE_SEAMLESS_BZ2)
 	 || (ENABLE_FEATURE_SEAMLESS_XZ)
 	) {
-		setup_unzip_on_fd(fd, /*fail_if_not_detected:*/ 1);
+		setup_unzip_on_fd(fd, /*fail_if_not_detected:*/ 0);
 	}
 
 	return fd;
